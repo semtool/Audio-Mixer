@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ButtunColorer : MonoBehaviour
+public class ButtonColorer : MonoBehaviour
 {
     [SerializeField] private Image _image;
     [SerializeField] private Color _swichOnColor;
@@ -27,7 +27,7 @@ public class ButtunColorer : MonoBehaviour
         _image.color = _swichOffColor;
     }
 
-    private void SetTypeColorOn()
+    public void SetTypeColorOn()
     {
         _isSelected = false;
         _image.color = _swichOnColor;

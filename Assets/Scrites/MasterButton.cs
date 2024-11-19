@@ -1,56 +1,63 @@
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(Toggle))]
 public class MasterButton : MonoBehaviour
 {
     [SerializeField] private GameObject _audioTracksSet;
     [SerializeField] private GameObject _text;
     [SerializeField] private AudioSource _backGroundSource;
-    [SerializeField] private ButtunColorer _buttunColorer;
+    [SerializeField] private ButtonColorer _buttonColorer;
 
+    private Toggle _toggle;
+    private Text _toggleText;
     private const string TurnOnMessage = "Звук Включен";
     private const string TurnOffMessage = "Звук Выключен";
-  
     private TrackButton[] _trackButtons;
-    private TextMeshProUGUI _buttonText;
     
-    public bool IsAllowed {  get; private set; }
-
     private void Awake()
     {
-        IsAllowed = true;
+        _toggle = GetComponent<Toggle>();
 
         _trackButtons = _audioTracksSet.GetComponentsInChildren<TrackButton>();
 
-        _buttonText = _text.GetComponent<TextMeshProUGUI>();
+        _toggleText = _text.GetComponent<Text>();
     }
 
     private void Start()
     {
-        SwichOffSound();       
+        SwichOffSound();
+
+        _toggle.isOn = false;
     }
 
-    public void ToggleSound()
+    public void OnEnable()
     {
-        if (IsAllowed)
+        _toggle.onValueChanged.AddListener(ToggleSound);
+    }
+
+    public void OnDisable()
+    {
+        _toggle.onValueChanged.RemoveListener(ToggleSound);
+    }
+
+    private void ToggleSound(bool marker)
+    {
+        if (marker)
         {
             TurnOnBackMusic();
 
-            _buttonText.text = TurnOnMessage;
+            _buttonColorer.ChangeColor();
 
-            _buttunColorer.ChangeColor();
-
-            IsAllowed = false;
+            _toggleText.text = TurnOnMessage;
         }
-        else if (!IsAllowed)
+        else 
         {
             SwichOffSound();
 
-            _buttunColorer.ChangeColor();
+            _buttonColorer.ChangeColor();
 
-            _buttonText.text = TurnOffMessage;
-
-            IsAllowed = true;
+            _toggleText.text = TurnOffMessage;
         }
     }
 
@@ -58,25 +65,23 @@ public class MasterButton : MonoBehaviour
     {
         foreach (var track in _trackButtons)
         {
-            AudioSource audioSource = track.GetComponent<AudioSource>();
+            track.TurnOffMusic();
 
-            audioSource.enabled = false;
-
-            track.GetComponent<ButtunColorer>().SetTypeColorOff();
+            track.GetComponent<ButtonColorer>().SetTypeColorOff();
 
             track.SetBunToPlaying();
         }
 
-        TurnOffBackMusic();
+        TurnOffBackMusic();       
     }
 
     private void TurnOnBackMusic()
     {
-        _backGroundSource.enabled = true;
+        _backGroundSource.Play();
     }
 
     private void TurnOffBackMusic()
     {
-        _backGroundSource.enabled = false;
+        _backGroundSource.Stop();
     }
 }

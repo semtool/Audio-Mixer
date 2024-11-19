@@ -1,11 +1,13 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(AudioSource))]
-
 public class TrackButton : MonoBehaviour
 {
     [SerializeField] private MasterButton _mainButton;
-    [SerializeField] private ButtunColorer _buttunColorer;
+    [SerializeField] private ButtonColorer _buttunColorer;
+    [SerializeField] private Button _button;
+    [SerializeField] private Toggle _toggle;
 
     private AudioSource _audioSource;
 
@@ -18,27 +20,14 @@ public class TrackButton : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
     }
 
-    public void ToPlay()
+    private void OnEnable()
     {
-        if (!_mainButton.IsAllowed)
-        {
-            if (!IsPlaying)
-            {
-                TurnOnMusic();
+        _button.onClick.AddListener(ToPlay);
+    }
 
-                _buttunColorer.ChangeColor();
-
-                IsPlaying = true;
-            }
-            else if (IsPlaying)
-            {
-                TurnOffMusic();
-
-                _buttunColorer.ChangeColor();
-
-                IsPlaying = false;
-            }
-        }
+    private void OnDisable()
+    {
+        _button.onClick.RemoveListener(ToPlay);
     }
 
     public void SetBunToPlaying()
@@ -46,13 +35,26 @@ public class TrackButton : MonoBehaviour
         IsPlaying = false;
     }
 
-    private void TurnOnMusic()
+    public void TurnOffMusic()
     {
-        _audioSource.enabled = true;
+        _audioSource.Stop();
     }
 
-    private void TurnOffMusic()
+    private void ToPlay()
     {
-        _audioSource.enabled = false;
+        if (_toggle.isOn)
+        {
+            if (!IsPlaying)
+            {
+                TurnOnMusic();
+
+                _buttunColorer.SetTypeColorOn();
+            }
+        }
+    }
+
+    private void TurnOnMusic()
+    {
+        _audioSource.Play();
     }
 }
